@@ -61,7 +61,14 @@ public class TCPServer implements Server {
 
         int n;
         byte[] buf = new byte[4092];
-        while(length != 0 && (n = dataInputStream.read(buf)) != -1){
+        while(length != 0){
+            try {
+                if ((n = dataInputStream.read(buf)) == -1) {
+                    break;
+                }
+            } catch (Exception e) {
+                continue;
+            }
             fileOutputStream.write(buf,0, n);
             fileOutputStream.flush();
             length -= n;
