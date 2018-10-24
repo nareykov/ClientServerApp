@@ -14,7 +14,7 @@ public class TCPServer implements Server {
 
     public TCPServer() {
         try {
-            serverSocket = new ServerSocket(220);
+            serverSocket = new ServerSocket(4443);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -104,6 +104,7 @@ public class TCPServer implements Server {
         try {
             System.out.println("Waiting for a client...");
             socket = serverSocket.accept();
+            socket.setKeepAlive(true);
 
             dataInputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             dataOutputStream = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));

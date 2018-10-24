@@ -13,8 +13,7 @@ public class TCPClient implements Client {
 
     public TCPClient() {
         try {
-           // InetAddress addr = InetAddress.getLocalHost();
-            socket = new Socket("", 220);
+            socket = new Socket("", 4444);
             socket.setKeepAlive(true);
 
             dataInputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -66,9 +65,14 @@ public class TCPClient implements Client {
         int n;
         byte[] buf = new byte[4092];
         while((n = fileInputStream.read(buf)) != -1){
-            dataOutputStream.write(buf,0, n);
-            System.out.println(n);
-            dataOutputStream.flush();
+            try {
+                dataOutputStream.write(buf,0, n);
+                System.out.println(n);
+                dataOutputStream.flush();
+            } catch (Exception e) {
+                Long position = fileInputStream.getChannel().position();
+                fileInputStream.getChannel().position(position - n);
+            }
         }
 
         if (dataInputStream.readUTF().equals("done")) {
@@ -97,7 +101,7 @@ public class TCPClient implements Client {
         int n;
         byte[] buf = new byte[4092];
         Long bytesRemaining = length;
-        while(bytesRemaining != 0 && (n = dataInputStream.read(buf)) != -1){
+        while(bytesRemaining != 0 && (n = dataInputStream.read(buf)) != -1) {
             fileOutputStream.write(buf,0, n);
             fileOutputStream.flush();
             bytesRemaining -= n;
