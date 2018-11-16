@@ -26,6 +26,7 @@ public class TCPServer implements Server {
         String command;
         try {
             command = dataInputStream.readUTF();
+            System.out.println("TCP " + command);
         } catch (Exception e) {
             command = null;
         }

@@ -5,7 +5,7 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Server server = new TCPServer();
+        Server server = new UDPServer();
         String command;
 
         while (true) {

@@ -3,7 +3,6 @@ package classes;
 import java.io.*;
 import java.net.*;
 import java.util.Date;
-import java.util.Timer;
 
 public class TCPClient implements Client {
 
@@ -13,7 +12,7 @@ public class TCPClient implements Client {
 
     public TCPClient() {
         try {
-            socket = new Socket("", 4444);
+            socket = new Socket("", 4443);
             socket.setKeepAlive(true);
 
             dataInputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));

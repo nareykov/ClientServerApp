@@ -8,7 +8,7 @@ public class Main {
     private static Scanner inputScanner = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException {
-        Client client = new TCPClient();
+        Client client = new UDPClient();
         String input;
 
         while ((input = inputScanner.next()) != null) {
