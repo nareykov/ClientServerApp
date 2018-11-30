@@ -9,7 +9,7 @@ public interface Client {
 
     void close() throws IOException;
 
-    void upload(String filename) throws IOException;
+    void upload(String filename) throws IOException, InterruptedException;
 
     void download(String filename) throws IOException;
 }

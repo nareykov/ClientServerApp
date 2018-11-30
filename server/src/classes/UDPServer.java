@@ -1,5 +1,7 @@
 package classes;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -79,7 +81,26 @@ public class UDPServer implements Server {
 
     @Override
     public void download() throws IOException {
+        String filename = receiveString();
+        File file;
+        try {
+            file = new File("server/files/" + filename);
+            sendBytes(longToBytes(1));
+        } catch (Exception e) {
+            sendBytes(longToBytes(0));
+            return;
+        }
+        long length = file.length();
+        sendBytes(longToBytes(length));
 
+        FileInputStream fileInputStream = new FileInputStream(file);
+        int n;
+        buf = new byte[4092];
+        while((n = fileInputStream.read(buf)) != -1){
+            buf = Arrays.copyOfRange(buf, 0, n);
+            sendBytes(buf);
+            System.out.println(n);
+        }
     }
 
     @Override

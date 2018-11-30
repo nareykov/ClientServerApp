@@ -9,7 +9,7 @@ public interface Server {
 
     void close() throws IOException;
 
-    void upload() throws IOException;
+    void upload() throws IOException, InterruptedException;
 
     void download() throws IOException;
 

@@ -2,6 +2,7 @@ package classes;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -78,7 +79,35 @@ public class UDPClient implements Client {
 
     @Override
     public void download(String filename) throws IOException {
+        Long startTime = new Date().getTime();
 
+        sendString("download");
+        sendString(filename);
+
+        if (bytesToLong(receiveBytes()) == 0) {
+            System.out.println("No such file");
+            return;
+        }
+
+        Long length = bytesToLong(receiveBytes());
+        FileOutputStream fileOutputStream = new FileOutputStream("client/files/" + filename);
+
+        int n = 4092;
+        buf = new byte[4092];
+        Long bytesRemaining = length;
+        while(bytesRemaining <= 0) {
+            receiveBytes();
+            fileOutputStream.write(buf,0, n);
+            fileOutputStream.flush();
+            bytesRemaining -= n;
+            if ((n = packet.getLength()) < 4092) {
+                break;
+            }
+        }
+        fileOutputStream.close();
+
+        Long endTime = new Date().getTime();
+        System.out.println("BITRATE: " + (length / (endTime - startTime)) + " KB/s");
     }
 
     private void sendBytes(byte[] bytes) throws IOException {

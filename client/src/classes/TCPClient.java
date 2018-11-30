@@ -9,10 +9,11 @@ public class TCPClient implements Client {
     private Socket socket;
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
+    private ConnectionHandler connectionHandler;
 
     public TCPClient() {
         try {
-            socket = new Socket("", 4443);
+            socket = new Socket("127.0.0.1", 4443);
             socket.setKeepAlive(true);
 
             dataInputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -48,7 +49,8 @@ public class TCPClient implements Client {
     }
 
     @Override
-    public void upload(String filename) throws IOException {
+    public void upload(String filename) throws IOException, InterruptedException {
+        ConnectionHandler connectionHandler = new ConnectionHandler();
         File file = new File("client/files/" + filename);
 
         Long startTime = new Date().getTime();
@@ -65,10 +67,14 @@ public class TCPClient implements Client {
         byte[] buf = new byte[4092];
         while((n = fileInputStream.read(buf)) != -1){
             try {
+                Thread.sleep(5);
                 dataOutputStream.write(buf,0, n);
                 System.out.println(n);
                 dataOutputStream.flush();
             } catch (Exception e) {
+                if (connectionHandler.closeConnection()) {
+                    return;
+                }
                 Long position = fileInputStream.getChannel().position();
                 fileInputStream.getChannel().position(position - n);
             }

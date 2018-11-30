@@ -55,7 +55,8 @@ public class TCPServer implements Server {
     }
 
     @Override
-    public void upload() throws IOException {
+    public void upload() throws IOException, InterruptedException {
+        ConnectionHandler connectionHandler = new ConnectionHandler();
         String filename = dataInputStream.readUTF();
         Long length = dataInputStream.readLong();
         FileOutputStream fileOutputStream = new FileOutputStream("server/files/" + filename);
@@ -67,12 +68,19 @@ public class TCPServer implements Server {
                 if ((n = dataInputStream.read(buf)) == -1) {
                     break;
                 }
+                fileOutputStream.write(buf,0, n);
+                fileOutputStream.flush();
+                length -= n;
+                System.out.println(length);
             } catch (Exception e) {
+                if (connectionHandler.closeConnection()) {
+                    fileOutputStream.close();
+                    close();
+                    connect();
+                    return;
+                }
                 continue;
             }
-            fileOutputStream.write(buf,0, n);
-            fileOutputStream.flush();
-            length -= n;
         }
         fileOutputStream.close();
 
@@ -113,6 +121,7 @@ public class TCPServer implements Server {
             System.out.println("Waiting for a client...");
             socket = serverSocket.accept();
             socket.setKeepAlive(true);
+            socket.setSoTimeout(1000);
 
             dataInputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             dataOutputStream = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
